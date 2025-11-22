@@ -177,6 +177,7 @@ p {
   position: sticky;
   top: 0;
   z-index: 100;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   background: rgba(255, 255, 255, 0.95);
 }
@@ -1489,4 +1490,15 @@ button:focus-visible {
   .footer-modern {
     display: none;
   }
+}
+
+/* ================================
+   19. Product Launch Badge
+   ================================ */
+
+.product-hunt-badge{
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 2rem;
 }

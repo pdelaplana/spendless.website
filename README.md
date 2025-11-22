@@ -312,7 +312,7 @@ Edit `css/styles.css`. Each section has its own clearly marked area.
 ## 📞 Support & Contact
 
 For issues or questions:
-- Email: hello@spendless.app
+- Email: help@getspendless.com
 - Documentation: See IMPLEMENTATION_PLAN.md for detailed specs
 
 ## 📄 License
