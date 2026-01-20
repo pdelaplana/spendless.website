@@ -47,7 +47,7 @@ npx http-server -p 8000
 php -S localhost:8000
 ```
 
-**Note:** No build process required. All files are served directly.
+**Note:** No build process required for the main site. For blog posts, run `npm run build:blog` after adding new articles.
 
 ### Testing & Validation
 
@@ -77,8 +77,11 @@ Simple deployment - upload entire directory to any static hosting service:
 - **`index.html`** - Complete landing page (all 10 sections in one file)
 - **`css/variables.css`** - Design system tokens (colors, typography, spacing)
 - **`css/styles.css`** - Main stylesheet with all component styles
+- **`css/blog.css`** - Blog-specific styles (listing page, article pages)
 - **`js/main.js`** - Core interactions, analytics, PWA features, scroll animations
 - **`js/email-capture.js`** - Email form validation and submission handling
+- **`scripts/build-blog.js`** - Blog build script (generates static HTML from markdown)
+- **`blog/_articles/`** - Source markdown files for blog posts
 
 ### Reference Documentation
 
@@ -169,6 +172,48 @@ CSS variables in `variables.css`: `--space-1` through `--space-20`
 
 **Custom events tracked:**
 - CTA clicks, scroll depth (25/50/75/100%), email signup, section views, PWA install
+
+### Blog System
+
+The blog uses a simple CMS approach: markdown files with YAML frontmatter are converted to static HTML via a Node.js build script.
+
+**Adding a new blog post:**
+
+1. Create a markdown file in `blog/_articles/` with frontmatter:
+   ```markdown
+   ---
+   title: Your Article Title
+   description: Brief description for SEO and previews
+   date: 2025-01-19
+   author: The Spendless Team
+   ---
+
+   Your markdown content here...
+   ```
+
+2. Build the blog:
+   ```bash
+   npm run build:blog
+   # or
+   node scripts/build-blog.js
+   ```
+
+3. The script generates:
+   - `blog/index.html` - Listing page with all articles
+   - `blog/[slug]/index.html` - Individual article pages
+
+**Frontmatter fields:**
+- `title` (required) - Article title
+- `description` (required) - SEO meta description
+- `date` (required) - Publication date (YYYY-MM-DD)
+- `author` (optional) - Author name, defaults to "The Spendless Team"
+- `modified` (optional) - Date last modified (YYYY-MM-DD), for SEO
+- `image` (optional) - Custom og:image URL for social sharing
+- `tags` (optional) - Array of keywords for SEO and article:tag meta
+
+**After adding new posts:**
+- Update `sitemap.xml` with new article URLs
+- Deploy all generated files
 
 ### Image Assets
 
@@ -288,7 +333,8 @@ Before deploying to production:
 - Monitor analytics weekly for conversion rates
 - A/B test headlines and CTA copy
 - Update content based on user feedback
-- Keep dependency-free (no npm packages to update)
+- Run `npm run build:blog` after adding new blog posts
+- Periodically update npm dependencies (`npm update`)
 
 **Performance:**
 - Enable gzip compression on hosting server
