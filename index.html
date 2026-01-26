@@ -120,8 +120,8 @@
   <!-- Skip Link for Accessibility -->
   <a href="#main-content" class="sr-only">Skip to main content</a>
 
-  <!-- Header with Logo -->
-  <header class="site-header">
+  <!-- Desktop Header (visible on larger viewports) -->
+  <header class="site-header desktop-header">
     <div class="container">
       <a href="/" class="logo-link">
         <img src="images/spendless-header-logo.png" alt="Spendless" class="site-logo">
@@ -138,6 +138,43 @@
       </div>
     </div>
   </header>
+
+  <!-- Mobile Header (visible on smaller viewports) -->
+  <header class="site-header mobile-header">
+    <div class="container">
+      <a href="/" class="logo-link">
+        <img src="images/spendless-header-logo.png" alt="Spendless" class="site-logo">
+      </a>
+
+      <button class="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span class="hamburger-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Sidebar (slides in from right) -->
+  <aside class="mobile-sidebar" aria-hidden="true">
+    <div class="mobile-sidebar-header">
+      <button class="mobile-sidebar-close" aria-label="Close menu">
+        <span>&times;</span>
+      </button>
+    </div>
+    <nav class="mobile-sidebar-nav">
+      <a href="#features" class="mobile-nav-link">Features</a>
+      <a href="#pricing" class="mobile-nav-link">Pricing</a>
+      <a href="/blog/" class="mobile-nav-link">Blog</a>
+    </nav>
+    <div class="mobile-sidebar-cta">
+      <a href="https://app.getspendless.com/signup" class="btn btn-primary">Get Started</a>
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay"></div>
 
   <!-- Hero Section - Centered, Bold, Modern -->
   <section class="hero-modern" id="main-content">
@@ -274,6 +311,32 @@
         </div>
         <div class="value-prop-image">
           <img src="images/manual-entry.png" alt="Manual entry interface for tracking spending with mindfulness categories" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Value Proposition 5: Mood-Based Spending Analysis -->
+  <section class="value-prop-section">
+    <div class="container">
+      <div class="value-prop-content">
+        <div class="value-prop-text">
+          <div class="value-prop-header">
+            <div class="value-prop-icon">
+              <ion-icon name="happy-outline"></ion-icon>
+            </div>
+            <h2>Track your mood, master your money</h2>
+          </div>
+          <p>Understand how your emotions affect your spending. Our mood-based tracking helps you identify emotional triggers and build healthier financial habits.</p>
+          <ul class="value-prop-list">
+            <li><ion-icon name="checkmark-circle"></ion-icon> 1-tap mood logging - capture how you feel with every purchase</li>
+            <li><ion-icon name="checkmark-circle"></ion-icon> Visual mood analysis - see which emotions drive your spending</li>
+            <li><ion-icon name="checkmark-circle"></ion-icon> Smart insights - get alerts when stress or emotions are affecting your budget</li>
+          </ul>
+        </div>
+        <div class="value-prop-images-cascade">
+          <img src="images/mood-tracking-entry.png" alt="Mood tracking interface showing emotion selection" loading="lazy">
+          <img src="images/mood-analysis-chart.png" alt="Chart showing spending breakdown by mood" loading="lazy" class="cascade-chart">
         </div>
       </div>
     </div>

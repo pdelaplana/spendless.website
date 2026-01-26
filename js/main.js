@@ -7,6 +7,79 @@
   'use strict';
 
   // ================================
+  // 0. Mobile Menu Toggle
+  // ================================
+
+  function initMobileMenu() {
+    const menuToggle = document.querySelector('.mobile-menu-toggle');
+    const mobileSidebar = document.querySelector('.mobile-sidebar');
+    const mobileOverlay = document.querySelector('.mobile-overlay');
+    const sidebarClose = document.querySelector('.mobile-sidebar-close');
+    const body = document.body;
+
+    if (!menuToggle || !mobileSidebar) return;
+
+    // Function to open sidebar
+    function openSidebar() {
+      menuToggle.classList.add('active');
+      mobileSidebar.classList.add('active');
+      mobileOverlay?.classList.add('active');
+      mobileSidebar.setAttribute('aria-hidden', 'false');
+      menuToggle.setAttribute('aria-expanded', 'true');
+      body.style.overflow = 'hidden'; // Prevent background scroll
+
+      // Track menu interaction
+      trackEvent('mobile_menu_toggle', {
+        event_category: 'Navigation',
+        event_label: 'Open'
+      });
+    }
+
+    // Function to close sidebar
+    function closeSidebar() {
+      menuToggle.classList.remove('active');
+      mobileSidebar.classList.remove('active');
+      mobileOverlay?.classList.remove('active');
+      mobileSidebar.setAttribute('aria-hidden', 'true');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      body.style.overflow = ''; // Restore scroll
+
+      // Track menu interaction
+      trackEvent('mobile_menu_toggle', {
+        event_category: 'Navigation',
+        event_label: 'Close'
+      });
+    }
+
+    // Toggle sidebar on hamburger click
+    menuToggle.addEventListener('click', function() {
+      if (mobileSidebar.classList.contains('active')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+
+    // Close on X button click
+    sidebarClose?.addEventListener('click', closeSidebar);
+
+    // Close when clicking overlay
+    mobileOverlay?.addEventListener('click', closeSidebar);
+
+    // Close when clicking a nav link
+    mobileSidebar.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', closeSidebar);
+    });
+
+    // Close on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && mobileSidebar.classList.contains('active')) {
+        closeSidebar();
+      }
+    });
+  }
+
+  // ================================
   // 1. Smooth Scrolling
   // ================================
 
@@ -316,7 +389,63 @@
   }
 
   // ================================
-  // 10. Lazy Loading Images (Fallback)
+  // 10. iPhone Frame Video Loading
+  // ================================
+
+  function initVideoFrameLoading() {
+    // Find all iPhone frames containing videos
+    const iphoneFrames = document.querySelectorAll('.iphone-frame');
+
+    iphoneFrames.forEach(frame => {
+      const video = frame.querySelector('video');
+
+      if (!video) {
+        // No video, just show the frame immediately
+        frame.classList.add('video-loaded');
+        return;
+      }
+
+      // Function to show frame when video is ready
+      function showFrame() {
+        frame.classList.add('video-loaded');
+      }
+
+      // Check if video is already loaded (cached)
+      if (video.readyState >= 3) { // HAVE_FUTURE_DATA or better
+        showFrame();
+        return;
+      }
+
+      // Listen for video ready event
+      video.addEventListener('canplaythrough', showFrame, { once: true });
+
+      // Fallback: also listen for loadeddata in case canplaythrough doesn't fire
+      video.addEventListener('loadeddata', function() {
+        // Small delay to ensure first frame is rendered
+        setTimeout(showFrame, 100);
+      }, { once: true });
+
+      // Timeout fallback - show frame after 5 seconds even if video hasn't loaded
+      // This prevents infinite loading state
+      setTimeout(() => {
+        if (!frame.classList.contains('video-loaded')) {
+          showFrame();
+          console.log('Video frame shown via timeout fallback');
+        }
+      }, 5000);
+
+      // Preload the video
+      video.preload = 'auto';
+
+      // Force load if not already loading
+      if (video.networkState === 0) { // NETWORK_EMPTY
+        video.load();
+      }
+    });
+  }
+
+  // ================================
+  // 11. Lazy Loading Images (Fallback)
   // ================================
 
   function initLazyLoading() {
@@ -341,7 +470,7 @@
   }
 
   // ================================
-  // 11. Dark Mode Detection (Optional)
+  // 12. Dark Mode Detection (Optional)
   // ================================
 
   function initDarkMode() {
@@ -364,7 +493,7 @@
   }
 
   // ================================
-  // 12. Initialize All Features
+  // 13. Initialize All Features
   // ================================
 
   function init() {
@@ -378,6 +507,7 @@
 
   function initializeApp() {
     // Initialize all features
+    initMobileMenu();
     initSmoothScroll();
     initScrollAnimations();
     initPWAInstall();
@@ -385,6 +515,7 @@
     initScrollDepthTracking();
     initSectionTracking();
     initExitIntent();
+    initVideoFrameLoading();
     initLazyLoading();
     initDarkMode();
     trackPerformance();

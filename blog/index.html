@@ -95,8 +95,8 @@
 <body>
 
   
-  <!-- Header with Logo -->
-  <header class="site-header">
+  <!-- Desktop Header (visible on larger viewports) -->
+  <header class="site-header desktop-header">
     <div class="container">
       <a href="../" class="logo-link">
         <img src="../images/spendless-header-logo.png" alt="Spendless" class="site-logo">
@@ -114,6 +114,43 @@
     </div>
   </header>
 
+  <!-- Mobile Header (visible on smaller viewports) -->
+  <header class="site-header mobile-header">
+    <div class="container">
+      <a href="../" class="logo-link">
+        <img src="../images/spendless-header-logo.png" alt="Spendless" class="site-logo">
+      </a>
+
+      <button class="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span class="hamburger-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Sidebar (slides in from right) -->
+  <aside class="mobile-sidebar" aria-hidden="true">
+    <div class="mobile-sidebar-header">
+      <button class="mobile-sidebar-close" aria-label="Close menu">
+        <span>&times;</span>
+      </button>
+    </div>
+    <nav class="mobile-sidebar-nav">
+      <a href="../#features" class="mobile-nav-link">Features</a>
+      <a href="../#pricing" class="mobile-nav-link">Pricing</a>
+      <a href="./" class="mobile-nav-link">Blog</a>
+    </nav>
+    <div class="mobile-sidebar-cta">
+      <a href="https://app.getspendless.com/signup" class="btn btn-primary">Get Started</a>
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay"></div>
+
   <main class="blog-listing">
     <div class="blog-container">
       <header class="blog-header">
@@ -123,6 +160,21 @@
 
       <div class="blog-grid">
         
+        <a href="mood-tracking/" class="blog-card">
+          <div class="blog-card-content">
+            <h2 class="blog-card-title">How to Master Your Money with Mood-Based Spending Tracking</h2>
+            <p class="blog-card-description">Discover how emotional spending affects your budget. Spendless introduces a new mood-based spending tracker to help you achieve financial mindfulness.</p>
+            <div class="blog-card-meta">
+              <span class="blog-date">January 24, 2025</span>
+              <span class="blog-separator">•</span>
+              <span class="blog-reading-time">3 min read</span>
+            </div>
+          </div>
+          <div class="blog-card-arrow">
+            <ion-icon name="arrow-forward"></ion-icon>
+          </div>
+        </a>
+
         <a href="recurring-spends/" class="blog-card">
           <div class="blog-card-content">
             <h2 class="blog-card-title">Introducing Smarter Recurring Spends</h2>

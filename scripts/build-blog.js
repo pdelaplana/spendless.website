@@ -14,10 +14,50 @@ const path = require('path');
 const frontMatter = require('front-matter');
 const { marked } = require('marked');
 
-// Configure marked for safe HTML output
+// Configure marked with custom renderer
+const renderer = new marked.Renderer();
+
+// Custom HTML renderer for iPhone frame embeds
+const originalHtmlRenderer = renderer.html.bind(renderer);
+renderer.html = function(html) {
+  // Ensure html is a string
+  if (typeof html === 'object' && html.text) {
+    html = html.text;
+  }
+  if (typeof html !== 'string') {
+    return originalHtmlRenderer(html) || '';
+  }
+  
+  // Check if it's a video tag with data-iphone-frame attribute
+  const iphoneVideoMatch = html.match(/<video[^>]*data-iphone-frame[^>]*src="([^"]+)"[^>]*>/i);
+  if (iphoneVideoMatch) {
+    const videoUrl = iphoneVideoMatch[1];
+    return `<div class="video">
+<div class="iphone-frame">
+<div class="iphone-screen">
+<div class="iphone-status-bar">
+<span class="iphone-status-time">9:41</span>
+<div class="iphone-status-icons">
+<div class="iphone-signal"><span></span><span></span><span></span><span></span></div>
+<div class="iphone-wifi"><span></span></div>
+<div class="iphone-battery"><div class="iphone-battery-body"><div class="iphone-battery-level"></div></div><div class="iphone-battery-cap"></div></div>
+</div>
+</div>
+<video width="300" autoplay muted loop playsinline>
+  <source src="${videoUrl}" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+</div>
+</div>
+</div>`;
+  }
+  return originalHtmlRenderer(html) || html;
+};
+
 marked.setOptions({
   gfm: true,
-  breaks: true
+  breaks: true,
+  renderer: renderer
 });
 
 // Paths
@@ -75,8 +115,8 @@ function formatDateISO(dateStr) {
  */
 function getHeaderHTML(rootPath = '', blogPath = 'blog/') {
   return `
-  <!-- Header with Logo -->
-  <header class="site-header">
+  <!-- Desktop Header (visible on larger viewports) -->
+  <header class="site-header desktop-header">
     <div class="container">
       <a href="${rootPath || '/'}" class="logo-link">
         <img src="${rootPath}images/spendless-header-logo.png" alt="Spendless" class="site-logo">
@@ -92,7 +132,44 @@ function getHeaderHTML(rootPath = '', blogPath = 'blog/') {
         <a href="https://app.getspendless.com/signup" class="btn btn-primary">Get Started</a>
       </div>
     </div>
-  </header>`;
+  </header>
+
+  <!-- Mobile Header (visible on smaller viewports) -->
+  <header class="site-header mobile-header">
+    <div class="container">
+      <a href="${rootPath || '/'}" class="logo-link">
+        <img src="${rootPath}images/spendless-header-logo.png" alt="Spendless" class="site-logo">
+      </a>
+
+      <button class="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span class="hamburger-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Sidebar (slides in from right) -->
+  <aside class="mobile-sidebar" aria-hidden="true">
+    <div class="mobile-sidebar-header">
+      <button class="mobile-sidebar-close" aria-label="Close menu">
+        <span>&times;</span>
+      </button>
+    </div>
+    <nav class="mobile-sidebar-nav">
+      <a href="${rootPath}#features" class="mobile-nav-link">Features</a>
+      <a href="${rootPath}#pricing" class="mobile-nav-link">Pricing</a>
+      <a href="${blogPath}" class="mobile-nav-link">Blog</a>
+    </nav>
+    <div class="mobile-sidebar-cta">
+      <a href="https://app.getspendless.com/signup" class="btn btn-primary">Get Started</a>
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay"></div>`;
 }
 
 /**
@@ -445,6 +522,23 @@ function generateListingPage(articles) {
 }
 
 /**
+ * Check if article needs rebuilding
+ */
+function needsRebuild(sourceFile, outputFile) {
+  // If output doesn't exist, needs rebuild
+  if (!fs.existsSync(outputFile)) {
+    return true;
+  }
+
+  // Compare modification times
+  const sourceStat = fs.statSync(sourceFile);
+  const outputStat = fs.statSync(outputFile);
+
+  // Rebuild if source is newer than output
+  return sourceStat.mtime > outputStat.mtime;
+}
+
+/**
  * Main build function
  */
 function build() {
@@ -468,6 +562,8 @@ function build() {
   console.log(`📄 Found ${files.length} article(s)\n`);
 
   const articles = [];
+  let rebuiltCount = 0;
+  let skippedCount = 0;
 
   // Process each article
   for (const file of files) {
@@ -503,19 +599,28 @@ function build() {
 
     // Create article directory
     const articleDir = path.join(BLOG_DIR, slug);
+    const articlePath = path.join(articleDir, 'index.html');
+
+    // Check if rebuild is needed
+    if (!needsRebuild(filePath, articlePath)) {
+      console.log(`   ⏭️  ${slug}/index.html (up to date)`);
+      skippedCount++;
+      continue;
+    }
+
     if (!fs.existsSync(articleDir)) {
       fs.mkdirSync(articleDir, { recursive: true });
     }
 
     // Generate article page
     const articleHTML = generateArticlePage(article);
-    const articlePath = path.join(articleDir, 'index.html');
     fs.writeFileSync(articlePath, articleHTML);
 
     console.log(`   ✅ ${slug}/index.html`);
+    rebuiltCount++;
   }
 
-  // Generate listing page
+  // Generate listing page (always regenerate to ensure it's current)
   if (articles.length > 0) {
     const listingHTML = generateListingPage(articles);
     const listingPath = path.join(BLOG_DIR, 'index.html');
@@ -523,7 +628,9 @@ function build() {
     console.log(`   ✅ blog/index.html`);
   }
 
-  console.log(`\n✨ Blog built successfully! Generated ${articles.length} article(s).`);
+  console.log(`\n✨ Blog built successfully!`);
+  console.log(`   ${rebuiltCount} article(s) rebuilt`);
+  console.log(`   ${skippedCount} article(s) skipped (up to date)`);
 }
 
 // Run build

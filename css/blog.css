@@ -306,6 +306,16 @@
     0 0 0 2px #333,
     0 15px 40px rgba(0, 0, 0, 0.3),
     inset 0 0 2px rgba(255, 255, 255, 0.1);
+  /* Video loading state - hidden until video loads */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Show frame when video is loaded */
+.iphone-frame.video-loaded {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .iphone-frame::after {
@@ -660,8 +670,5 @@
     font-size: var(--font-size-body-large);
   }
 
-  /* Hide nav links on mobile to keep header clean */
-  .header-nav {
-    display: none;
-  }
+  /* Desktop header is hidden on mobile via styles.css */
 }
